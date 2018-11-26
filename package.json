@@ -5,5 +5,8 @@
   "license": "MIT",
   "description": "Print error and exit on unhandled rejection",
   "repository": "https://github.com/abrkn/panik.git",
-  "author": "Andreas Brekken <andreas@brekken.com>"
+  "author": "Andreas Brekken <andreas@brekken.com>",
+  "dependencies": {
+    "debug": "4.1.0"
+  }
 }
