@@ -8,5 +8,8 @@
   "author": "Andreas Brekken <andreas@brekken.com>",
   "dependencies": {
     "debug": "4.1.0"
+  },
+  "devDependencies": {
+    "@sentry/node": "4.4.1"
   }
 }

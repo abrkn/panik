@@ -17,6 +17,13 @@ process.on('unhandledRejection', function(error) {
   });
 });
 
-debug('Attached unhandledRejection handler');
+process.on('uncaughtException', printErrorAndExit);
 
-Object.assign(exports, { printErrorAndExit });
+debug('Attached unhandledRejection and uncaughtException handlers');
+
+Object.assign(exports, {
+  printErrorAndExit,
+  reportError: error => console.error('ERROR', error.stack),
+  reportMessage: message => console.log('LOG', message),
+  reportEvent: event => console.log('EVENT', event),
+});
