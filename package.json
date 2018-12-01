@@ -1,6 +1,6 @@
 {
   "name": "panik",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "main": "index.js",
   "license": "MIT",
   "description": "Print error and exit on unhandled rejection",
