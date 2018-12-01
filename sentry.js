@@ -25,13 +25,21 @@ function createPanikWithSentry(sentryDsn) {
     defaultIntegrations: false,
   });
 
+  let exiting = false;
+
   const printErrorAndExit = error => {
     console.error(`Unhandled error in process`);
     console.error(error.stack || error || 'Unknown error');
 
+    if (exiting) {
+      return;
+    }
+
     const eventId = Sentry.captureException(error);
 
     console.error(`Reporting to Sentry as event ${eventId} and exiting in 2 sec...`);
+
+    exiting = true;
 
     setTimeout(() => {
       const code = error.code || 1;
