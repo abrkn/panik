@@ -64,7 +64,7 @@ function createPanikWithSentry(sentryDsn) {
     printErrorAndExit,
     reportError: error => {
       console.error('ERROR', error.stack);
-      console.Sentry.captureException(error);
+      Sentry.captureException(error);
     },
     reportMessage: message => {
       console.log('LOG', message);
