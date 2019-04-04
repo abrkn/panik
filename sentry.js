@@ -1,7 +1,8 @@
 const assert = require('assert');
+const git = require('git-rev-sync');
 const debug = require('debug')('panik');
 
-const { SENTRY_DSN, NODE_ENV } = process.env;
+const { SENTRY_DSN, NODE_ENV, SENTRY_NAME } = process.env;
 
 const hasModule = name => {
   try {
@@ -12,18 +13,21 @@ const hasModule = name => {
   }
 };
 
-function createPanikWithSentry(sentryDsn) {
+function createPanikWithSentry(sentryDsn, options) {
   assert(sentryDsn, 'sentryDsn required');
 
-  debug(`Configuring Sentry...`);
+  options = options || {};
+
+  const optionsText = JSON.stringify(options);
+  debug(`Configuring Sentry with options ${optionsText}...`);
 
   const Sentry = require('@sentry/node');
 
-  Sentry.init({
+  Sentry.init(Object.assign({
     dsn: SENTRY_DSN,
     environment: NODE_ENV || 'development',
     defaultIntegrations: false,
-  });
+  }, options));
 
   let exiting = false;
 
@@ -80,7 +84,9 @@ function createPanikWithSentry(sentryDsn) {
 const hasSentryModule = hasModule('@sentry/node');
 
 if (SENTRY_DSN && hasSentryModule) {
-  module.exports = createPanikWithSentry(SENTRY_DSN);
+  module.exports = createPanikWithSentry(SENTRY_DSN, {
+    release: SENTRY_NAME ? `${SENTRY_NAME}@${git.long()}` : undefined,
+  });
 } else {
   console.warn(
     `Falling back to panik without Sentry. SENTRY_DSN set? ${!!SENTRY_DSN}; Has Sentry module? ${hasSentryModule}`

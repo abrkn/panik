@@ -7,7 +7,8 @@
   "repository": "https://github.com/abrkn/panik.git",
   "author": "Andreas Brekken <andreas@brekken.com>",
   "dependencies": {
-    "debug": "4.1.0"
+    "debug": "4.1.0",
+    "git-rev-sync": "1.12.0"
   },
   "devDependencies": {
     "@sentry/node": "4.4.1"
