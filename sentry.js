@@ -2,7 +2,7 @@ const assert = require('assert');
 const git = require('git-rev-sync');
 const debug = require('debug')('panik');
 
-const { SENTRY_DSN, NODE_ENV, SENTRY_NAME } = process.env;
+const { SENTRY_DSN, NODE_ENV, SENTRY_NAME,m HEROKU_APP_NAME } = process.env;
 
 const hasModule = name => {
   try {
@@ -84,8 +84,10 @@ function createPanikWithSentry(sentryDsn, options) {
 const hasSentryModule = hasModule('@sentry/node');
 
 if (SENTRY_DSN && hasSentryModule) {
+  const name = SENTRY_NAME || HEROKU_APP_NAME || undefined;
+
   module.exports = createPanikWithSentry(SENTRY_DSN, {
-    release: SENTRY_NAME ? `${SENTRY_NAME}@${git.long()}` : undefined,
+    release: name ? `${name}@${git.long()}` : undefined,
   });
 } else {
   console.warn(
