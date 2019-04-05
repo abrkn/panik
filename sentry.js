@@ -2,7 +2,7 @@ const assert = require('assert');
 const git = require('git-rev-sync');
 const debug = require('debug')('panik');
 
-const { SENTRY_DSN, NODE_ENV, SENTRY_NAME,m HEROKU_APP_NAME } = process.env;
+const { SENTRY_DSN, NODE_ENV, SENTRY_NAME, HEROKU_APP_NAME } = process.env;
 
 const hasModule = name => {
   try {
@@ -23,11 +23,16 @@ function createPanikWithSentry(sentryDsn, options) {
 
   const Sentry = require('@sentry/node');
 
-  Sentry.init(Object.assign({
-    dsn: SENTRY_DSN,
-    environment: NODE_ENV || 'development',
-    defaultIntegrations: false,
-  }, options));
+  Sentry.init(
+    Object.assign(
+      {
+        dsn: SENTRY_DSN,
+        environment: NODE_ENV || 'development',
+        defaultIntegrations: false,
+      },
+      options
+    )
+  );
 
   let exiting = false;
 
