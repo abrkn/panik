@@ -2,7 +2,27 @@ const assert = require('assert');
 const git = require('git-rev-sync');
 const debug = require('debug')('panik');
 
-const { SENTRY_DSN, NODE_ENV, SENTRY_NAME, HEROKU_APP_NAME } = process.env;
+const { SENTRY_DSN, NODE_ENV, SENTRY_NAME, HEROKU_APP_NAME, HEROKU_SLUG_COMMIT, APP } = process.env;
+
+const getAppName = () => SENTRY_NAME || HEROKU_APP_NAME || APP || 'app';
+
+const maybeGetHash = () => {
+  try {
+    return git.long();
+  } catch (error) {
+    return false;
+  }
+};
+
+const maybeGetRelease = () => {
+  const hash = HEROKU_SLUG_COMMIT || maybeGetHash();
+
+  if (hash === false) {
+    return undefined;
+  }
+
+  return getAppName();
+};
 
 const hasModule = name => {
   try {
@@ -33,6 +53,20 @@ function createPanikWithSentry(sentryDsn, options) {
       options
     )
   );
+
+  let scope;
+
+  Sentry.configureScope(_ => {
+    scope = _
+  });
+
+  assert(scope);
+
+  const appName = getAppName();
+
+  if (appName !== 'app') {
+    scope.setTag("app", appName);
+  }
 
   let exiting = false;
 
@@ -89,10 +123,8 @@ function createPanikWithSentry(sentryDsn, options) {
 const hasSentryModule = hasModule('@sentry/node');
 
 if (SENTRY_DSN && hasSentryModule) {
-  const name = SENTRY_NAME || HEROKU_APP_NAME || undefined;
-
   module.exports = createPanikWithSentry(SENTRY_DSN, {
-    release: name ? `${name}@${git.long()}` : undefined,
+    release: maybeGetRelease(),
   });
 } else {
   console.warn(
