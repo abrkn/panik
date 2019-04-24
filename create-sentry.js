@@ -116,7 +116,7 @@ function createPanikWithSentry(sentryDsn, options) {
       console.error('ERROR', errorToReport.stack || errorToReport.message);
 
       if (errorToReport.data) {
-        console.error(`ERROR data`, data);
+        console.error(`ERROR data`, errorToReport.data);
       }
 
       Sentry.captureException(errorToReport);
