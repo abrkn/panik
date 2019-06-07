@@ -104,7 +104,14 @@ function createPanikWithSentry(sentryDsn, options) {
     });
   });
 
-  process.on('uncaughtException', printErrorAndExit);
+  process.on('uncaughtException', function(error) {
+    if (error.message.match(/denied due to rate limiting/)) {
+      debug('Ignoring 429 error from Sentry');
+      return;
+    }
+
+    printErrorAndExit(error);
+  });
 
   debug('Attached unhandledRejection and uncaughtException handlers');
 
