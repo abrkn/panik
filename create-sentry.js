@@ -70,6 +70,11 @@ function createPanikWithSentry(sentryDsn, options) {
   let exiting = false;
 
   const printErrorAndExit = error => {
+    if (error.message.match(/denied due to rate limiting/)) {
+      debug('Ignoring 429 error from Sentry');
+      return;
+    }
+
     const errorToReport = options.prepareError ? options.prepareError(error) : error;
 
     console.error(`Unhandled error in process`);
@@ -105,11 +110,6 @@ function createPanikWithSentry(sentryDsn, options) {
   });
 
   process.on('uncaughtException', function(error) {
-    if (error.message.match(/denied due to rate limiting/)) {
-      debug('Ignoring 429 error from Sentry');
-      return;
-    }
-
     printErrorAndExit(error);
   });
 
