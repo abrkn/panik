@@ -69,16 +69,26 @@ function createPanikWithSentry(sentryDsn, options) {
 
   let exiting = false;
 
-  const printErrorAndExit = error => {
-    if (error.message.match(/denied due to rate limiting/)) {
-      debug('Ignoring 429 error from Sentry');
-      return;
+  const getErrorToReport = error => {
+    let errorToReport = options.prepareError ? options.prepareError(error) : error;
+
+    if (!(errorToReport instanceof Error)) {
+      errorToReport = new Error(`Non-error thrown: ${JSON.stringify(error)}`);
     }
 
-    const errorToReport = options.prepareError ? options.prepareError(error) : error;
+    return errorToReport;
+  };
+
+  const printErrorAndExit = error => {
+    const errorToReport = getErrorToReport(error);
 
     console.error(`Unhandled error in process`);
     console.error(errorToReport.stack || errorToReport || 'Unknown error');
+
+    if (errorToReport.message.match(/denied due to rate limiting/)) {
+      debug('Ignoring 429 error from Sentry');
+      return;
+    }
 
     if (errorToReport.data) {
       console.error(`Error data`, errorToReport.data);
@@ -118,7 +128,7 @@ function createPanikWithSentry(sentryDsn, options) {
   return {
     printErrorAndExit,
     reportError: error => {
-      const errorToReport = options.prepareError ? options.prepareError(error) : error;
+      const errorToReport = getErrorToReport(error);
 
       console.error('ERROR', errorToReport.stack || errorToReport.message);
 
