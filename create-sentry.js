@@ -85,7 +85,7 @@ function createPanikWithSentry(sentryDsn, options) {
     console.error(`Unhandled error in process`);
     console.error(errorToReport.stack || errorToReport || 'Unknown error');
 
-    if (errorToReport.message.match(/denied due to rate limiting/)) {
+    if (errorToReport.message.match(/denied due to rate limiting|429/)) {
       debug('Ignoring 429 error from Sentry');
       return;
     }
